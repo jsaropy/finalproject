@@ -1,27 +1,40 @@
 #include <stdio.h>
+#include <stdlib.h>
 
-void drawline(int a, char line)
-{
-    for (int i = 0; i < a; i++)
-    {
-        printf("%c", line);
-    }
-}
+#include "invfunc.c"
+#include "menus.c"
 
-void display_menu()
-{
-    printf("\n");
-    printf("Press '1' to register\n");
-    printf("Press '2' to login\n");
-    printf("Press '3' for a description\n");
-    printf("\n");
-}
+#define RED "\x1B[31m"
+#define BLU "\x1B[34m"
+#define RESET "\x1B[0m"
 
 int main(void) 
 {
-    printf("Inventory\n");
-    drawline(30, '-');
+    // Print menu
+    clearscr();
     display_menu();
 
-    
+    // Ask for user input
+    int input;
+
+    do {
+        input = get_int();
+        if (input > 3 || input < 1)
+        {
+            printf(RED "Error: Please provide a number between 1-3\n" RESET);
+            clearscr();
+            display_menu();
+        }
+    } while (input > 3 || input < 1);
+
+    switch (input) {
+        case 1:
+            clearscr();
+            display_register();
+            char *un_register = get_username();
+        case 2:
+            clearscr();
+            display_login();
+            char *un_login = get_username();
+    }
 }

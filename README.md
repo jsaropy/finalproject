@@ -7,27 +7,46 @@ My final project is an cli program, that entails an inventory management system 
 The cli program allows the user to add/remove/modify and track the inventory of their business.
 
 TODO:
-1. Make the display for the starting page of the CLI program
+✅ 1. Make the display for the starting page of the CLI program 
 
-Inventory
---------------------------------------
-- press '1' to register
-- press '2' to login
-- press '3' for description
+✅ 2. Complete get user input number
+- Don't use cs50.h
+- Create get input yourself 
 
-2. Complete get user input number 
+3. Redirect user to pages
+- Redirect user to register page (If user types 1 display the following things):
+    - First clear terminal screen
+    - Username:
+    - Password (*):
+    - Password (Repeat): 
 
-3. Complete register -> SQlite API for C
+- Redirect user to login page (If user types 2 display the following things):
+    - First clear terminal screen
+    - Username:
+    - Password (*)
+
+- Redirect user to description page (If user types 3 display the following things):
+    - Clear screen
+    - display_description
+
+4. Create DB
+- Create DB with sqlite3
+- Link db into C program
+- READ SQLite C api docs
+
+DB GRAPH: <link>
+
+5. Complete register -> SQlite API for C
 - When an user registers, it should be put in an sqlite database
 - Registering with an existing username should show an error
 - Store HASHED password in database
 
-4. Complete Login 
+6. Complete Login 
 - When an user logs in check username if in db
-- WHen user logs in check password in db
+- When user logs in check password in db
 - If one of the two fails display error
 
-5. Complete inventory UI
+7. Complete inventory UI
 - User has the option to add inventory
 - Put this item in DB
 - Show DB items in home 
