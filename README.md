@@ -13,6 +13,9 @@ TODO:
 - Don't use cs50.h
 - Create get input yourself 
 
+⛔ BUG: When inputting '3' in starting menu, the program exits with error provide
+nr between 1-3. Why?
+
 3. Redirect user to pages
 - Redirect user to register page (If user types 1 display the following things):
     - First clear terminal screen
