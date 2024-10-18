@@ -27,24 +27,28 @@ void display_menu()
     drawline(30, '-');
 }
 
+//TODO
 void display_register()
 {
     printf(BLU "Register\n" RESET);
     drawline(30, '-');
 }
 
+//TODO
 void display_login()
 {
     printf(BLU "Login\n" RESET);
     drawline(30, '-');
 }
 
+//TODO
 void display_description()
 {
     printf("\n");
     printf(BLU "This is an inventory management system.\n" RESET);
     printf(BLU "This system allows you to easily track the inventory of your business.\n" RESET);
     printf(BLU "Simple functions: add/remove/modify/track the inventory of your business.\n" RESET);
+    printf(BLU "PLease register or login to use the service.\n" RESET);
     printf("\n");
 }
 
@@ -53,26 +57,18 @@ void clearscr()
     system("@cls||clear");
 }
 
-char get_number()
+int get_number()
 {
-    char num;
+    char num[10];
     printf("Enter number: ");
-    scanf("%c", &num);
-    
-    int number = num - '0';
+    scanf("%s", num);
 
-    if (isdigit(num) == 0 && number > 10)
-    {
-        printf(RED "ERROR: please provide a number\n" RESET);
-        exit(0);
-    }
-
-    if (number < 1 || number > 3)
+    if (atoi(num) < 1 || atoi(num) > 3)
     {
         printf(RED "ERROR: Please provide a number between 1-3\n" RESET);
+        exit(0);
     }
-
-    return number;
+    return atoi(num);
 }
 
 char* get_username()

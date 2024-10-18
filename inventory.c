@@ -1,7 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <string.h>
 #include "invfunc.c"
+
+#define RED "\x1B[31m"
+#define BLU "\x1B[34m"
+#define RESET "\x1B[0m"
 
 int main(void) 
 {
@@ -11,10 +16,14 @@ int main(void)
 
     // Ask for user input
     int input = get_number();
-    
+
+    printf("%i", input);
+
     while (input == 3)
     {
+        clearscr();
         display_description();
+        display_menu();
         input = get_number();
     }
 
@@ -22,12 +31,11 @@ int main(void)
     {
         clearscr();
         display_register();
-        char *un_register = get_username();
     }
     else if (input == 2)
     {
         clearscr();
         display_login();
-        char *un_login = get_username();
-    }   
+    }
+    
 }

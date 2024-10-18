@@ -13,14 +13,18 @@ TODO:
 - Don't use cs50.h
 - Create get input yourself 
 
-⛔ BUG: When inputting '3' in starting menu, the program exits with error provide
-nr between 1-3. Why?
+3. Create DB
+- Create DB with sqlite3
+- Link db into C program
+- READ SQLite C api docs
 
-3. Redirect user to pages
+DB GRAPH: ![Database](DB-finalproject.drawio.png)
+
+4. Redirect user to pages
 - Redirect user to register page (If user types 1 display the following things):
     - First clear terminal screen
-    - Username:
-    - Password (*):
+    - Username (Must be unique, so check DB):
+    - Password (Save hashed version in DB): ****
     - Password (Repeat): 
 
 - Redirect user to login page (If user types 2 display the following things):
@@ -28,16 +32,10 @@ nr between 1-3. Why?
     - Username:
     - Password (*)
 
-- Redirect user to description page (If user types 3 display the following things):
-    - Clear screen
+✅ - Show the user the description (If user types 3 display the following things):
     - display_description
-
-4. Create DB
-- Create DB with sqlite3
-- Link db into C program
-- READ SQLite C api docs
-
-DB GRAPH: <link>
+    - display menu
+    - ONly add the description at the top of the menu, and refresh the page. 
 
 5. Complete register -> SQlite API for C
 - When an user registers, it should be put in an sqlite database
