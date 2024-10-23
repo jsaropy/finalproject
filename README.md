@@ -18,7 +18,7 @@ TODO:
 - Link db into C program
 - READ SQLite C api docs
 
-DB GRAPH: ![Database](DB-finalproject.drawio.png)
+DB GRAPH: ![Database](assets/DB-finalproject.drawio.png)
 
 4. Redirect user to pages
 - Redirect user to register page (If user types 1 display the following things):
