@@ -14,7 +14,7 @@ TODO:
 - Create get input yourself 
 
 3. Create DB
-- Create DB with sqlite3
+✅ - Create DB with sqlite3
 - Link db into C program
 - READ SQLite C api docs
 
