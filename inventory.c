@@ -60,7 +60,7 @@ int main(void)
         } 
 
         // Check the username
-        check_username(username);
+        get_username(username);
 
         // Check if username exists in database if not, place in DB (with help of GPT)
         char *sql = "SELECT username from users";
