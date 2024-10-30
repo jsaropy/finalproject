@@ -70,8 +70,10 @@ void display_register()
     printf("\n");
 }
 
-int check_length(char *usrname)
+char *check_username(char *usrname)
 {
+    printf("Username: ");
+    scanf("%49s", usrname);
     int length = strlen(usrname);
 
     // Check length of username and prompt again if length is not sufficient
@@ -81,6 +83,7 @@ int check_length(char *usrname)
         scanf("%49s", usrname);
         length = strlen(usrname);
     }
+    return usrname;
 }
 
 int existence(void *input_username, int argc, char **argv, char **azColName)
