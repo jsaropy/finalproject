@@ -70,7 +70,7 @@ void display_register()
     printf("\n");
 }
 
-char *check_username(char *usrname)
+char *get_username(char *usrname)
 {
     printf("Username: ");
     scanf("%49s", usrname);
