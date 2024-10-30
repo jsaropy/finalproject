@@ -3,6 +3,7 @@
 #include <sqlite3.h>
 #include <string.h>
 #include <strings.h>
+#include <unistd.h>
 #include "invfunc.c"
 
 #define RED "\x1B[31m"
@@ -34,10 +35,10 @@ int main(void)
     clearscr();
     display_menu();
 
-    // Ask for user input
+    // Ask for user input // !! CHECK THIS FOR BETTER DESIGN
     int input = get_number();
 
-    // If input = 3 display the description 
+    // If input = 3 display the description // !! CHECK THIS FOR BETTER DESIGN
     while (input == 3) {
         clearscr();
         display_description();
@@ -58,12 +59,8 @@ int main(void)
             return 1;
         } 
 
-        // You can put this in a function named check length
-        printf("Username: ");
-        scanf("%49s", username);
-
-        // Check the length of the username
-        check_length(username);
+        // Check the username
+        check_username(username);
 
         // Check if username exists in database if not, place in DB (with help of GPT)
         char *sql = "SELECT username from users";
@@ -78,6 +75,46 @@ int main(void)
             sqlite3_free(err_msg);
         }
 
+        // Get user password
+        char *password = malloc(buffer * sizeof(char));
+        char *pw_repeat = malloc(buffer * sizeof(char));
+
+        if (password == NULL || pw_repeat == NULL) {
+            fprintf(stderr, RED "ERROR: Failed to allocate memory\n" RESET);
+            return 1;
+        }
+
+        // Since getpass overwrites and we use it two times (for pw repeat) use placeholder
+        char *placeholder;
+        
+        // get password, repeat until its between 5-50 characters
+        do {
+        placeholder = getpass("Password: ");
+            if (strlen(placeholder) > 50) {
+                fprintf(stderr, RED "ERROR: Maximum of 50 characters\n" RESET);
+            }
+            else if (strlen(placeholder) < 5) {
+                fprintf(stderr, RED "ERROR: Your password should be atleast 5 characters\n" RESET);
+            }
+        } while (strlen(placeholder) < 5 || strlen(placeholder) > 49);
+               
+        strncpy(password, placeholder, 49);
+
+        // get password repeat, do this until password and repeat match
+        while (strcmp(password, pw_repeat) != 0) {
+            placeholder = getpass("Repeat Password: ");
+            if (strcmp(placeholder, password) != 0) {
+                fprintf(stderr, RED"Error: Passwords don't match"RESET);
+            }
+            else {
+                strncpy(pw_repeat, placeholder, 49);
+            }
+        }
+
+        
+
+        free(password);
+        free(pw_repeat);
         free(username);
         rc = sqlite3_close(db);
     }
