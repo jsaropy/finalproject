@@ -75,7 +75,7 @@ int main(void)
             sqlite3_free(err_msg);
         }
 
-        // Get user password
+        // Allocate memory to get password and password repeat
         char *password = malloc(buffer * sizeof(char));
         char *pw_repeat = malloc(buffer * sizeof(char));
 
@@ -83,35 +83,14 @@ int main(void)
             fprintf(stderr, RED "ERROR: Failed to allocate memory\n" RESET);
             return 1;
         }
-
-        // Since getpass overwrites and we use it two times (for pw repeat) use placeholder
-        char *placeholder;
         
-        // get password, repeat until its between 5-50 characters
-        do {
-        placeholder = getpass("Password: ");
-            if (strlen(placeholder) > 50) {
-                fprintf(stderr, RED "ERROR: Maximum of 50 characters\n" RESET);
-            }
-            else if (strlen(placeholder) < 5) {
-                fprintf(stderr, RED "ERROR: Your password should be atleast 5 characters\n" RESET);
-            }
-        } while (strlen(placeholder) < 5 || strlen(placeholder) > 49);
-               
-        strncpy(password, placeholder, 49);
+        // get password
+        get_password(password);
+        printf("%s\n", password);
 
-        // get password repeat, do this until password and repeat match
-        while (strcmp(password, pw_repeat) != 0) {
-            placeholder = getpass("Repeat Password: ");
-            if (strcmp(placeholder, password) != 0) {
-                fprintf(stderr, RED"Error: Passwords don't match"RESET);
-            }
-            else {
-                strncpy(pw_repeat, placeholder, 49);
-            }
-        }
-
-        
+        // get password repeat, function does this until password and password repeat match
+        pwrepeat_compare(password, pw_repeat);
+        printf("%s\n", pw_repeat);
 
         free(password);
         free(pw_repeat);

@@ -28,11 +28,14 @@ TODO:
         - For username, malloc a place in memory for the maximum length of the string -> username ✅
         - Check if username exists in DB ✅
         - If exist, output error ✅
-    - Password (Save hashed version in DB): ****
-    - In terminal output should be *'s
-    - Password (Repeat): 
-    - Sotre username in database
+    - Password  ✅
+    - No terminal output ✅
+    - Password (Repeat) ✅
+    - Store username in database 
     - Hash password, and store in database (function hash)
+
+    > [!NOTE]
+    > I need to provide a way to exit at any time during the program, because the user can get stuck.
 
 - Redirect user to login page (If user types 2 display the following things):
     - First clear terminal screen

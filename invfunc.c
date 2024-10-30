@@ -7,6 +7,8 @@
 #define BLU "\x1B[34m"
 #define RESET "\x1B[0m"
 
+#define esc 27
+
 void drawline(int a, char line)
 {
     for (int i = 0; i < a; i++)
@@ -103,6 +105,37 @@ int existence(void *input_username, int argc, char **argv, char **azColName)
         }
     }
     return 0;
+}
+
+char *get_password(char *pwd) 
+{        
+    char *placeholder;
+    // get password, repeat until its between 5-50 characters
+    do {
+    placeholder = getpass("Password: ");
+        if (strlen(placeholder) > 50) {
+            fprintf(stderr, RED "ERROR: Maximum of 50 characters\n" RESET);
+        }
+        else if (strlen(placeholder) < 5) {
+            fprintf(stderr, RED "ERROR: Your password should be atleast 5 characters\n" RESET);
+        }
+    } while (strlen(placeholder) < 5 || strlen(placeholder) > 49);
+    strncpy(pwd, placeholder, 49);
+}
+
+char *pwrepeat_compare(char *passw, char *passw_repeat)
+{
+    char *placeholder;
+
+    while (strcmp(passw, passw_repeat) != 0) {
+        placeholder = getpass("Repeat Password: ");
+        if (strcmp(placeholder, passw) != 0) {
+            fprintf(stderr, RED"Error: Passwords don't match\n"RESET);
+        }
+        else {
+            strncpy(passw_repeat, placeholder, 49);
+        }
+    }
 }
 
 //TODO
