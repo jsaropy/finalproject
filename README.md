@@ -13,7 +13,7 @@ TODO:
 - Don't use cs50.h
 - Create get input yourself 
 
-✅## 3. Create DB
+## ✅ 3. Create DB
 ✅ - Create DB with sqlite3
 ✅- Link db into C program
 ✅- READ SQLite C api docs
