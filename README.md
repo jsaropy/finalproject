@@ -34,8 +34,8 @@ TODO:
     - Store username in database 
     - Hash password, and store in database (function hash)
 
-    > [!NOTE]
-    > I need to provide a way to exit at any time during the program, because the user can get stuck.
+> [!NOTE]
+> I need to provide a way to exit at any time during the program, because the user can get stuck.
 
 - Redirect user to login page (If user types 2 display the following things):
     - First clear terminal screen
