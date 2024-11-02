@@ -11,6 +11,8 @@
 #define GREEN "\x1B[32m"
 #define RESET "\x1B[0m"
 
+#define buffer 50
+
 typedef struct user {
     int session_id;
     char *username;
@@ -51,7 +53,6 @@ int main(void)
         clearscr();
         display_register();
         
-        int buffer = 50;
         char *username = malloc(buffer * sizeof(char));
 
         if (username == NULL) {
@@ -63,8 +64,8 @@ int main(void)
         get_username(username);
 
         // Check if username exists in database if not, place in DB (with help of GPT)
-        char *sql = "SELECT username from users";
-        rc = sqlite3_exec(db, sql, existence, (void *)username, &err_msg);
+        char *get_unames = "SELECT username from users";
+        rc = sqlite3_exec(db, get_unames, existence, (void *)username, &err_msg);
 
         if (rc == SQLITE_OK) {
             printf("Succes\n");
@@ -91,6 +92,22 @@ int main(void)
         // get password repeat, function does this until password and password repeat match
         pwrepeat_compare(password, pw_repeat);
         printf("%s\n", pw_repeat);
+
+        //Create sql query with username
+        char *insert_username;
+        snprintf(insert_username, sizeof(char) * buffer, "INSERT INTO users (username) VALUES (%s)", username);
+
+        //TODO: place username in DB
+
+        //TODO: Initialize libsodium and use pwhash* API
+
+        //TODO: Salt pw??
+
+        //TODO: hash password and place hash in database
+
+        //TODO: place memory free's securely (passwords shouldn't stay in memory for long)
+
+        printf("%s\n", insert_username);
 
         free(password);
         free(pw_repeat);
