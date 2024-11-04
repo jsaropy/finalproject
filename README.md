@@ -59,4 +59,13 @@ TODO:
 # Dependencies (Add tutorials for installing these before using project)
 - SQLite3
 - Libsodium
+<<<<<<< HEAD
+- Unistd.h -> for Windows
+=======
+- Unistd.h -> for Windows
+>>>>>>> 5495d989f6e376e3de3e696e2c8b8202e923e6a7
+
+# Dependencies (Add tutorials for installing these before using project)
+- SQLite3
+- Libsodium
 - Unistd.h -> for Windows
