@@ -13,7 +13,7 @@ TODO:
 - Don't use cs50.h
 - Create get input yourself 
 
-## 3. Create DB
+3. Create DB
 ✅ - Create DB with sqlite3
 ✅- Link db into C program
 ✅- READ SQLite C api docs
@@ -47,8 +47,17 @@ TODO:
     - display menu
     - ONly add the description at the top of the menu, and refresh the page. 
 
+5. Complete register -> SQlite API for C
+- When an user registers, it should be put in an sqlite database
+- Registering with an existing username should show an error
+- Store HASHED password in database
 
-# 5. Complete inventory UI
+6. Complete Login 
+- When an user logs in check username if in db
+- When user logs in check password in db
+- If one of the two fails display error
+
+7. Complete inventory UI
 - User has the option to add inventory
 - Put this item in DB
 - Show DB items in home 
@@ -56,7 +65,3 @@ TODO:
 - Remove from DB
 - Remove from UI
 
-# Dependencies (Add tutorials for installing these before using project)
-- SQLite3
-- Libsodium
-- Unistd.h -> for Windows
