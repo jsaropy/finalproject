@@ -26,9 +26,11 @@ TODO:
     - display_register next ✅
     - Username (Must be unique, so check DB): ✅
         - For username, malloc a place in memory for the maximum length of the string -> username ✅
+        - ⛔ ERROR: username accepts whitespace 
         - Check if username exists in DB ✅
         - If exist, output error ✅
     - Password  ✅
+    - ⛔ ERROR: password accepts whitespace
     - No terminal output ✅
     - Password (Repeat) ✅
     - Store username in database 
