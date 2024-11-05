@@ -68,21 +68,21 @@ void display_register()
     drawline(30, '-');
     printf("\n");
     printf(BLU "Provide an username and password.\n" RESET);
-    printf(BLU "The username/password must be at least 5 characters.\n" RESET);
+    printf(BLU "The username/password must be between 5-50 characters.\n" RESET);
     printf("\n");
 }
 
 char *get_username(char *usrname)
 {
     printf("Username: ");
-    scanf("%49s", usrname);
+    scanf("%s", usrname);
     int length = strlen(usrname);
 
     // Check length of username and prompt again if length is not sufficient
-    while (length < 5) {
-        fprintf(stderr, RED "ERROR: Username should be at least 5 characters\n" RESET);
+    while (length < 5 || length > 49) {
+        fprintf(stderr, RED "ERROR: Username should be between 5-49 characters\n" RESET);
         printf("Username: ");
-        scanf("%49s", usrname);
+        scanf("%s", usrname);
         length = strlen(usrname);
     }
     return usrname;
@@ -117,7 +117,7 @@ char *get_password(char *pwd)
             fprintf(stderr, RED "ERROR: Maximum of 50 characters\n" RESET);
         }
         else if (strlen(placeholder) < 5) {
-            fprintf(stderr, RED "ERROR: Your password should be atleast 5 characters\n" RESET);
+            fprintf(stderr, RED "ERROR: Your password should be between 5-49 characters\n" RESET);
         }
     } while (strlen(placeholder) < 5 || strlen(placeholder) > 49);
     strncpy(pwd, placeholder, 49);
