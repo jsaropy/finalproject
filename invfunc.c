@@ -2,12 +2,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
+#include <unistd.h>
+#include <sodium.h>
+
+
+#include "invfunc.h"
 
 #define RED "\x1B[31m"
 #define BLU "\x1B[34m"
 #define RESET "\x1B[0m"
-
-#define esc 27
 
 void drawline(int a, char line)
 {
@@ -88,6 +91,7 @@ char *get_username(char *usrname)
     return usrname;
 }
 
+// Redesign to make it reusable in login screen
 int existence(void *input_username, int argc, char **argv, char **azColName)
 {
     // Call back username to extra data input (void *input_username)
@@ -97,17 +101,15 @@ int existence(void *input_username, int argc, char **argv, char **azColName)
         // If the column name is username
         if (strcasecmp(azColName[i], "username") == 0) {
             // While the username exists in db, reprompt.
-            while (strcasecmp(username, argv[i]) == 0) {
-                printf(RED "ERROR: Username already exists\n" RESET);
-                printf("Username: ");
-                scanf("%49s", username);
+            if (strcasecmp(username, argv[i]) == 0) {
+                return 1;
             }
         }
     }
     return 0;
 }
 
-char *get_password(char *pwd) 
+void get_password(char *pwd) 
 {        
     char *placeholder;
     // get password, repeat until its between 5-50 characters
@@ -123,7 +125,7 @@ char *get_password(char *pwd)
     strncpy(pwd, placeholder, 49);
 }
 
-char *pwrepeat_compare(char *passw, char *passw_repeat)
+void pwrepeat_compare(char *passw, char *passw_repeat)
 {
     char *placeholder;
 
@@ -138,9 +140,33 @@ char *pwrepeat_compare(char *passw, char *passw_repeat)
     }
 }
 
+int prompt_compare_hash(char *login_password, const unsigned char *account_hash) 
+{
+    // prompt and compare password hash. This can be a function
+    int max_password_tries = 0;
+
+    do {
+        get_password(login_password);
+
+        if (crypto_pwhash_str_verify ((const char *)account_hash, login_password, strlen(login_password)) != 0) {
+        fprintf(stderr, RED "ERROR: Wrong password\n" RESET);
+        max_password_tries++;
+        }
+
+        if (max_password_tries > 2) {
+            fprintf(stderr, RED "Max tries reached, exiting application\n" RESET);
+            return 1;
+        }
+
+    } while (crypto_pwhash_str_verify ((const char *)account_hash, login_password, strlen(login_password)) != 0);
+    return 0;
+}
+
 //TODO
 void display_login()
 {
     printf(BLU "Login\n" RESET);
     drawline(30, '-');
 }
+
+// TODO: login functions

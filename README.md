@@ -33,16 +33,36 @@ TODO:
     - ⛔ ERROR: password accepts whitespace
     - No terminal output ✅
     - Password (Repeat) ✅
-    - Store username in database 
-    - Hash password, and store in database (function hash)
+    - Store username in database ✅
+    - Hash password, and store in database (function hash) ✅
 
 > [!NOTE]
  > I need to provide a way to exit at any time during the program, because the user can get stuck.
+ > Additionally fix errors?
+ > Change snprintf statements, they are prone to sql injection attacks
 
 ## Redirect user to login page (If user types 2 display the following things):
-    - First clear terminal screen
-    - Username:
-    - Password (*)
+    - First clear terminal screen ✅
+    - Username: (get_username) ✅
+        - Compare if username exists in DB ✅
+        - If not print error (while loop) ✅
+    - Password (*) (get_password)
+        - Compare password with password hashes (while loop)
+        - libsodium has a way to compare the password hashes.
+
+    - When log in successful, display the main screen
+        - assign the struct user the logged in username
+        - assign the struct user the user_id which becomes the session ID
+    - The goal is to show/add/modify products based on this session ID
+    - 
+    - The main screen contains an menu, but shows the current inventory as a standard
+    - Allow to add inventory items
+        - Product name
+        - Product price
+        - Supplier
+        - Field with date ordered
+        - Date received
+        - Quantity
 
 ✅ - Show the user the description (If user types 3 display the following things):
     - display_description
