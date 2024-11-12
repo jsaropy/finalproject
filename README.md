@@ -13,6 +13,7 @@ TODO:
 - Don't use cs50.h
 - Create get input yourself 
 
+
 ## 3. Create DB
 ✅ - Create DB with sqlite3
 ✅- Link db into C program
@@ -50,19 +51,39 @@ TODO:
         - libsodium has a way to compare the password hashes. ✅
 
     - When log in successful, display the main screen
-        - assign the struct user the logged in username
-        - assign the struct user the user_id which becomes the session ID
+        - assign the struct user the logged in username ✅
+        - assign the struct user the user_id which becomes the session ID ✅
+        - Add mock product into database (all tables) ✅
+        - TODO: convert sql querys to functions -> just get hash left
+        - ⛔ Error at checking register & login username, the error messages get skipped
+        - Show current products based on session ID
         - The goal is to show/add/modify products based on this session ID
-        - Showing current inventory is the standard procedure 
+        - Showing current inventory is the standard display of main menu 
+        - ⛔ Extend user input choice to 4 choices, >a choice to exit the program<
 
-    - The main screen contains an menu, but shows the current inventory as a standard
-    - Allow to add inventory items
-        - Product name
-        - Product price
-        - Supplier
-        - Field with date ordered
-        - Date received
-        - Quantity
+        - Allow to add inventory items
+            - Product name
+            - Product price
+            - Supplier
+            - place user_id in orders
+            - Field with date ordered
+            - Date received
+            - Quantity
+            - place order_id in orderproducts
+            - place prod_id in order products
+            - place prod_id in product supplier
+            - place supplier_id in product supplier
+
+                SQL querys to insert
+                sqlite> INSERT INTO orders (user_id, date_ordered, date_received) VALUES (1, '11-11-2024', '12-11-2024');
+                sqlite> INSERT INTO products (prod_name, prod_price) VALUES ('BIC Pens', 20.00);
+                sqlite> INSERT INTO orderproducts (order_id, prod_id, quantity) VALUES (1, 1, 3);
+                sqlite> INSERT INTO suppliers (name, address) VALUES ('Bookshop Van der Kreek', 'Lievevrouwestraat 12');
+                sqlite> INSERT INTO productsupplier (prod_id, supplier_id) VALUES (1, 1);
+
+
+        - Modify products
+            - Allow user to modify the products in the database (e.g., quantity etc)
 
 ✅ - Show the user the description (If user types 3 display the following things):
     - display_description
