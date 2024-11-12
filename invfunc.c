@@ -24,7 +24,7 @@ void drawline(int a, char line)
 void display_menu()
 {
     printf("\n");
-    printf(BLU "Inventory\n" RESET);
+    printf(BLU "Inventory.c\n" RESET);
     drawline(30, '-');
     printf("\n");
     printf("- Enter '1' to register\n");
@@ -140,6 +140,15 @@ void pwrepeat_compare(char *passw, char *passw_repeat)
     }
 }
 
+//TODO
+void display_login()
+{
+    printf(BLU "Login\n" RESET);
+    drawline(30, '-');
+}
+
+// login functions
+
 int prompt_compare_hash(char *login_password, const unsigned char *account_hash) 
 {
     // prompt and compare password hash. This can be a function
@@ -162,11 +171,14 @@ int prompt_compare_hash(char *login_password, const unsigned char *account_hash)
     return 0;
 }
 
-//TODO
-void display_login()
+void display_main(char *username)
 {
-    printf(BLU "Login\n" RESET);
+    drawline(30, '-');
+    printf(BLU "Hi %s, Welcome to Inventory.c\n" RESET, username);
+    drawline(30, '-');
+    printf(BLU "Enter '1' to add an item\n" RESET);
+    printf(BLU "Enter '2' to remove an item\n" RESET);
+    printf(BLU "Enter '3' to modify stock\n" RESET);
     drawline(30, '-');
 }
 
-// TODO: login functions

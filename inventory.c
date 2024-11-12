@@ -13,6 +13,11 @@
 #define buffer 51
 #define query_buffer 200
 
+typedef struct {
+    char *username;
+    int session_id;
+} user;
+
 int main(void) 
 {
     // Open DB connection (with the help of GPT)
@@ -173,7 +178,7 @@ int main(void)
         memset(login_password, 0, buffer * sizeof(char));
         
         // Get hash linked to username in DB
-        char *get_hash = "SELECT hash FROM users WHERE username LIKE ?;";
+        char *get_hash = "SELECT user_id, hash FROM users WHERE username LIKE ?;";
 
         rc = sqlite3_prepare_v2(db, get_hash, -1, &stmt, NULL);
         if (rc != SQLITE_OK) {
@@ -188,8 +193,8 @@ int main(void)
         }
         
         rc = sqlite3_step(stmt);
-
-        const unsigned char *account_hash = sqlite3_column_text(stmt, 0);
+        int user_id = sqlite3_column_int(stmt, 0);
+        const unsigned char *account_hash = sqlite3_column_text(stmt, 1);
 
         // sqlite3_step finalize of reset?
 
@@ -198,9 +203,16 @@ int main(void)
             return 1;
         }
 
-
-        free(login_username);
         free(login_password);
+
+        user activeuser = {login_username, user_id};
+
+        clearscr();
+        printf("username = %s\n", activeuser.username);
+        printf("id = %i\n", activeuser.session_id);
+        display_main(login_username);
+        
+        free(login_username);
 
     }
 }

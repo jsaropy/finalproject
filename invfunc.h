@@ -30,8 +30,11 @@ void get_password(char *pwd);
 // Repeat password function of user, with comparison of previousy provided password
 void pwrepeat_compare(char *passw, char *passw_repeat);
 
+// Display login menu
+void display_login();
+
 // Prompt for login and compare password to acc hash
 int prompt_compare_hash(char *login_password, const unsigned char *account_hash); 
 
-// Display login menu
-void display_login();
+// diplay main menu when logged in
+void display_main(char *username);
