@@ -24,11 +24,17 @@ char *get_username(char *usrname);
 // Check existence of username in database
 int existence(void *input_username, int argc, char **argv, char **azColName);
 
+// compare usernames
+int compare_usernames(sqlite3 *db, char *username);
+
 // User input of password
 void get_password(char *pwd);
 
 // Repeat password function of user, with comparison of previousy provided password
 void pwrepeat_compare(char *passw, char *passw_repeat);
+
+// create user
+int create_user(sqlite3 *db, char *username, unsigned char hash[crypto_pwhash_STRBYTES]);
 
 // Display login menu
 void display_login();

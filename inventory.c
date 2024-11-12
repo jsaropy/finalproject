@@ -34,7 +34,7 @@ int main(void)
         return 1;
     }        
 
-    //TODO: Initialize libsodium to use pwhash* API
+    // Initialize libsodium to use pwhash* API
     if (sodium_init() < 0) {
         fprintf(stderr, RED "ERROR: Failed to initialize Libsodium" RESET);
         return 1;
@@ -67,21 +67,10 @@ int main(void)
         //initialize all bytes to 0 to prevent unpredictable behavior 
         memset(register_username, 0 , buffer * sizeof(char));
 
-        //SQL query to select usernames from table
-        char *get_regunames = "SELECT username from users;";
-
-        // Prompt until user has unique username
         do {
-            // Get & Check the username
-            get_username(register_username);
-            // Check if username exists in database if not, place in DB (with help of GPT)
-            rc = sqlite3_exec(db, get_regunames, existence, (void *)register_username, &err_msg);
-            if (rc != 0) {
-                fprintf(stderr, RED "ERROR: Username already exists\n" RESET);
-            }
-        } while (rc != 0);
-
-        printf("Username = %s\n", register_username);
+                compare_usernames(db, register_username);
+                fprintf(stderr, RED "ERROR: Username exists\n" RESET);
+        } while (compare_usernames(db, register_username) == 0);
 
         // Allocate memory to get password and password repeat
         char *register_password = malloc(buffer * sizeof(char));
@@ -111,34 +100,7 @@ int main(void)
         free(register_password);
         free(pw_repeat);
 
-        //Create sql query with username
-        char *insert_registration = "INSERT INTO users (username, hash) VALUES (?, ?);";
-        
-        rc = sqlite3_prepare_v2(db, insert_registration, -1, &stmt, NULL);
-        if (rc != SQLITE_OK) {
-            fprintf(stderr, RED "Failed to prepare statement: %s\n" RESET, sqlite3_errmsg(db));
-            return 1;
-        }
-
-        rc = sqlite3_bind_text(stmt, 1, register_username, -1, SQLITE_STATIC);
-        if (rc != SQLITE_OK) {
-            fprintf(stderr, RED "Failed to bind username: %s\n" RESET, sqlite3_errmsg(db));
-            return 1;
-        }
-
-        rc = sqlite3_bind_blob(stmt, 2, hashed_password, crypto_pwhash_STRBYTES, SQLITE_STATIC);
-        if (rc != SQLITE_OK) {
-            fprintf(stderr, RED "Failed to bind password: %s\n" RESET, sqlite3_errmsg(db));
-            return 1;
-        }
-        
-        rc = sqlite3_step(stmt);
-        if (rc == SQLITE_DONE) {
-            printf(BLU "Registration succesful\n" RESET);
-            return 0;
-        }
-        else {
-            fprintf(stderr, RED "ERROR: Registration failed: %s\n" RESET, sqlite3_errmsg(db));
+        if (create_user(db, register_username, hashed_password) != 0) {
             return 1;
         }
         
@@ -157,18 +119,10 @@ int main(void)
         }
         memset(login_username, 0, buffer * sizeof(char));
 
-        //SQL query to select usernames from table
-        char *get_logunames = "SELECT username from users";
-
-        //prompt for username until a match is found
         do {
-            get_username(login_username);
-            rc = sqlite3_exec(db, get_logunames, existence, (void *) login_username, &err_msg);
-
-            if (rc == 0) {
-                fprintf(stderr, RED "ERROR: Incorrect username\n" RESET);
-            }
-        } while (rc == 0);
+            compare_usernames(db, login_username);
+            fprintf(stderr, RED "ERROR: Wrong username\n" RESET);
+        } while (compare_usernames(db, login_username) == 1);
 
         char *login_password = malloc(buffer * sizeof(char));
         if (login_password == NULL) {
@@ -210,7 +164,13 @@ int main(void)
         clearscr();
         printf("username = %s\n", activeuser.username);
         printf("id = %i\n", activeuser.session_id);
-        display_main(login_username);
+        display_main(activeuser.username);
+
+        //show current inventory
+
+        //add inventory
+
+        //modify inventory
         
         free(login_username);
 

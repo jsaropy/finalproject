@@ -3,14 +3,17 @@
 #include <string.h>
 #include <strings.h>
 #include <unistd.h>
+#include <sqlite3.h>
 #include <sodium.h>
-
 
 #include "invfunc.h"
 
 #define RED "\x1B[31m"
 #define BLU "\x1B[34m"
 #define RESET "\x1B[0m"
+
+sqlite3_stmt *stmt;
+int rc;
 
 void drawline(int a, char line)
 {
@@ -91,22 +94,39 @@ char *get_username(char *usrname)
     return usrname;
 }
 
-// Redesign to make it reusable in login screen
-int existence(void *input_username, int argc, char **argv, char **azColName)
+int compare_usernames(sqlite3 *db, char *username)
 {
-    // Call back username to extra data input (void *input_username)
-    char * username = (char *)input_username;
+    //SQL query to select usernames from table
+    char *get_unames = "SELECT username FROM users WHERE username = ?;";
+    sqlite3_stmt *stmt;
+    int rc;
 
-    for (int i = 0; i < argc; i++) {
-        // If the column name is username
-        if (strcasecmp(azColName[i], "username") == 0) {
-            // While the username exists in db, reprompt.
-            if (strcasecmp(username, argv[i]) == 0) {
-                return 1;
-            }
-        }
+    // Get & Check the username
+    get_username(username);
+        
+    // Check if username exists in database if not, place in DB (with help of GPT)
+    rc = sqlite3_prepare_v2(db, get_unames, -1, &stmt, NULL);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, RED "Failed to prepare statement: %s\n" RESET, sqlite3_errmsg(db));
+        return -1;
     }
-    return 0;
+
+    rc = sqlite3_bind_text(stmt, 1, username, -1, SQLITE_STATIC);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, RED "Failed to bind username: %s\n" RESET, sqlite3_errmsg(db));
+        return 1;
+    }
+
+    rc = sqlite3_step(stmt);
+
+    if (rc == SQLITE_ROW) {
+        return 0; //username exists
+    }
+    else {
+        return 1; //username doesnt exist
+    }
+
+    sqlite3_reset(stmt);
 }
 
 void get_password(char *pwd) 
@@ -140,15 +160,52 @@ void pwrepeat_compare(char *passw, char *passw_repeat)
     }
 }
 
-//TODO
+// create user
+int create_user(sqlite3 *db, char *username, unsigned char hash[crypto_pwhash_STRBYTES])
+{
+    //Create sql query with username
+    char *insert_registration = "INSERT INTO users (username, hash) VALUES (?, ?);";
+    
+    rc = sqlite3_prepare_v2(db, insert_registration, -1, &stmt, NULL);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, RED "Failed to prepare statement: %s\n" RESET, sqlite3_errmsg(db));
+        return 1;
+    }
+
+    rc = sqlite3_bind_text(stmt, 1, username, -1, SQLITE_STATIC);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, RED "Failed to bind username: %s\n" RESET, sqlite3_errmsg(db));
+        return 1;
+    }
+
+    rc = sqlite3_bind_blob(stmt, 2, hash, crypto_pwhash_STRBYTES, SQLITE_STATIC);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, RED "Failed to bind password: %s\n" RESET, sqlite3_errmsg(db));
+        return 1;
+    }
+    
+    rc = sqlite3_step(stmt);
+    if (rc == SQLITE_DONE) {
+        printf(BLU "Registration succesful\n" RESET);
+        return 0;
+    }
+    else {
+        fprintf(stderr, RED "ERROR: Registration failed: %s\n" RESET, sqlite3_errmsg(db));
+        return 1;
+    }
+
+    sqlite3_reset(stmt);
+}
+
 void display_login()
 {
     printf(BLU "Login\n" RESET);
     drawline(30, '-');
 }
 
-// login functions
+// get hash & id & compare
 
+// compare hash with password
 int prompt_compare_hash(char *login_password, const unsigned char *account_hash) 
 {
     // prompt and compare password hash. This can be a function
@@ -174,7 +231,7 @@ int prompt_compare_hash(char *login_password, const unsigned char *account_hash)
 void display_main(char *username)
 {
     drawline(30, '-');
-    printf(BLU "Hi %s, Welcome to Inventory.c\n" RESET, username);
+    printf(BLU "Hi %s, welcome to Inventory.c\n" RESET, username);
     drawline(30, '-');
     printf(BLU "Enter '1' to add an item\n" RESET);
     printf(BLU "Enter '2' to remove an item\n" RESET);
@@ -182,3 +239,10 @@ void display_main(char *username)
     drawline(30, '-');
 }
 
+// show current inventory select * from user_inventory
+
+// check date format
+
+// check quantity format
+
+// 
