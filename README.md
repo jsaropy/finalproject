@@ -39,22 +39,22 @@ TODO:
 > [!NOTE]
  > I need to provide a way to exit at any time during the program, because the user can get stuck.
  > Additionally fix errors?
- > Change snprintf statements, they are prone to sql injection attacks
 
 ## Redirect user to login page (If user types 2 display the following things):
     - First clear terminal screen ✅
     - Username: (get_username) ✅
         - Compare if username exists in DB ✅
         - If not print error (while loop) ✅
-    - Password (*) (get_password)
-        - Compare password with password hashes (while loop)
-        - libsodium has a way to compare the password hashes.
+    - Password (*) (get_password) ✅
+        - Compare password with password hashes (while loop) ✅
+        - libsodium has a way to compare the password hashes. ✅
 
     - When log in successful, display the main screen
         - assign the struct user the logged in username
         - assign the struct user the user_id which becomes the session ID
-    - The goal is to show/add/modify products based on this session ID
-    - 
+        - The goal is to show/add/modify products based on this session ID
+        - Showing current inventory is the standard procedure 
+
     - The main screen contains an menu, but shows the current inventory as a standard
     - Allow to add inventory items
         - Product name
