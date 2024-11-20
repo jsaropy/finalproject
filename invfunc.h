@@ -19,19 +19,19 @@ int get_number();
 void display_register();
 
 // Get username, allows user to input username
-char *get_username(char *usrname);
+char *get_username(char *username);
 
 // Check existence of username in database
-int existence(void *input_username, int argc, char **argv, char **azColName);
+int existence(void *username, int argc, char **argv, char **azColName);
 
 // compare usernames
 int compare_usernames(sqlite3 *db, char *username);
 
 // User input of password
-void get_password(char *pwd);
+void get_password(char *password);
 
 // Repeat password function of user, with comparison of previousy provided password
-void pwrepeat_compare(char *passw, char *passw_repeat);
+void pwrepeat_compare(char *password, char *password_repeat);
 
 // create user
 int create_user(sqlite3 *db, char *username, unsigned char hash[crypto_pwhash_STRBYTES]);
@@ -40,7 +40,10 @@ int create_user(sqlite3 *db, char *username, unsigned char hash[crypto_pwhash_ST
 void display_login();
 
 // Prompt for login and compare password to acc hash
-int prompt_compare_hash(char *login_password, const unsigned char *account_hash); 
+int prompt_compare_hash(char *login_password, const unsigned char *hash); 
 
 // diplay main menu when logged in
 void display_main(char *username);
+
+// show inventory select * from view
+int show_inventory(sqlite3 *db, int session_id);

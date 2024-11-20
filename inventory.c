@@ -68,9 +68,12 @@ int main(void)
         memset(register_username, 0 , buffer * sizeof(char));
 
         do {
-                compare_usernames(db, register_username);
-                fprintf(stderr, RED "ERROR: Username exists\n" RESET);
-        } while (compare_usernames(db, register_username) == 0);
+            // Get & Check the username
+            get_username(register_username);
+            if (compare_usernames(db, register_username) == SQLITE_ROW) {
+                    fprintf(stderr, RED "ERROR: Username exists\n" RESET);
+            }
+        } while (compare_usernames(db, register_username) == SQLITE_ROW);
 
         // Allocate memory to get password and password repeat
         char *register_password = malloc(buffer * sizeof(char));
@@ -120,9 +123,11 @@ int main(void)
         memset(login_username, 0, buffer * sizeof(char));
 
         do {
-            compare_usernames(db, login_username);
-            fprintf(stderr, RED "ERROR: Wrong username\n" RESET);
-        } while (compare_usernames(db, login_username) == 1);
+            get_username(login_username);
+            if (compare_usernames(db, login_username) == SQLITE_DONE) {
+                fprintf(stderr, RED "ERROR: Wrong username\n" RESET);
+            }
+        } while (compare_usernames(db, login_username) == SQLITE_DONE);
 
         char *login_password = malloc(buffer * sizeof(char));
         if (login_password == NULL) {
@@ -150,8 +155,6 @@ int main(void)
         int user_id = sqlite3_column_int(stmt, 0);
         const unsigned char *account_hash = sqlite3_column_text(stmt, 1);
 
-        // sqlite3_step finalize of reset?
-
         //prompt and compare pw with input
         if (prompt_compare_hash(login_password, account_hash) != 0) {
             return 1;
@@ -162,15 +165,19 @@ int main(void)
         user activeuser = {login_username, user_id};
 
         clearscr();
-        printf("username = %s\n", activeuser.username);
-        printf("id = %i\n", activeuser.session_id);
         display_main(activeuser.username);
 
         //show current inventory
+        show_inventory(db, activeuser.session_id);
 
-        //add inventory
+        // choice menu for user when loggedin
+        int loggedin_input = get_number();
+        // switch (loggedin_input) {
+        //     case 1:
+        //     case 2:
+        //     case 3:
+        // }
 
-        //modify inventory
         
         free(login_username);
 

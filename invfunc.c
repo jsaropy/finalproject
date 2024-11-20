@@ -55,16 +55,18 @@ void clearscr()
 int get_number()
 {
     char num[10];
-    printf("Enter number: ");
-    scanf("%s", num);
 
     // Check if the numbers provided are between 1-3
-    while (atoi(num) < 1 || atoi(num) > 3)
-    {
-        fprintf(stderr, RED "ERROR: Please provide a number between 1-3\n" RESET);
+    do {
         printf("Enter number: ");
         scanf("%s", num);
-    }
+
+        if (atoi(num) < 1 || atoi(num) > 3) {
+            fprintf(stderr, RED "ERROR: Please provide a number between 1-3\n" RESET);
+        }
+
+    } while (atoi(num) < 1 || atoi(num) > 3);
+
     return atoi(num);
 }
 
@@ -78,34 +80,31 @@ void display_register()
     printf("\n");
 }
 
-char *get_username(char *usrname)
+char *get_username(char *username) //Can be redesigned more efficiently
 {
     printf("Username: ");
-    scanf("%s", usrname);
-    int length = strlen(usrname);
+    scanf("%s", username);
+    int length = strlen(username);
 
     // Check length of username and prompt again if length is not sufficient
     while (length < 5 || length > 49) {
         fprintf(stderr, RED "ERROR: Username should be between 5-49 characters\n" RESET);
         printf("Username: ");
-        scanf("%s", usrname);
-        length = strlen(usrname);
+        scanf("%s", username);
+        length = strlen(username);
     }
-    return usrname;
+    return username;
 }
 
 int compare_usernames(sqlite3 *db, char *username)
 {
     //SQL query to select usernames from table
-    char *get_unames = "SELECT username FROM users WHERE username = ?;";
+    char *get_usernames = "SELECT username FROM users WHERE username = ?;";
     sqlite3_stmt *stmt;
     int rc;
-
-    // Get & Check the username
-    get_username(username);
         
     // Check if username exists in database if not, place in DB (with help of GPT)
-    rc = sqlite3_prepare_v2(db, get_unames, -1, &stmt, NULL);
+    rc = sqlite3_prepare_v2(db, get_usernames, -1, &stmt, NULL);
     if (rc != SQLITE_OK) {
         fprintf(stderr, RED "Failed to prepare statement: %s\n" RESET, sqlite3_errmsg(db));
         return -1;
@@ -118,18 +117,17 @@ int compare_usernames(sqlite3 *db, char *username)
     }
 
     rc = sqlite3_step(stmt);
-
     if (rc == SQLITE_ROW) {
-        return 0; //username exists
+        return rc; //username exists
+        sqlite3_reset(stmt);
     }
     else {
-        return 1; //username doesnt exist
+        return rc; //username doesnt exist
+        sqlite3_reset(stmt);
     }
-
-    sqlite3_reset(stmt);
 }
 
-void get_password(char *pwd) 
+void get_password(char *password) 
 {        
     char *placeholder;
     // get password, repeat until its between 5-50 characters
@@ -142,20 +140,20 @@ void get_password(char *pwd)
             fprintf(stderr, RED "ERROR: Your password should be between 5-49 characters\n" RESET);
         }
     } while (strlen(placeholder) < 5 || strlen(placeholder) > 49);
-    strncpy(pwd, placeholder, 49);
+    strncpy(password, placeholder, 49);
 }
 
-void pwrepeat_compare(char *passw, char *passw_repeat)
+void pwrepeat_compare(char *password, char *password_repeat)
 {
     char *placeholder;
 
-    while (strcmp(passw, passw_repeat) != 0) {
+    while (strcmp(password, password_repeat) != 0) {
         placeholder = getpass("Repeat Password: ");
-        if (strcmp(placeholder, passw) != 0) {
+        if (strcmp(placeholder, password) != 0) {
             fprintf(stderr, RED"Error: Passwords don't match\n"RESET);
         }
         else {
-            strncpy(passw_repeat, placeholder, 49);
+            strncpy(password_repeat, placeholder, 49);
         }
     }
 }
@@ -203,10 +201,8 @@ void display_login()
     drawline(30, '-');
 }
 
-// get hash & id & compare
-
 // compare hash with password
-int prompt_compare_hash(char *login_password, const unsigned char *account_hash) 
+int prompt_compare_hash(char *login_password, const unsigned char *hash) 
 {
     // prompt and compare password hash. This can be a function
     int max_password_tries = 0;
@@ -214,35 +210,74 @@ int prompt_compare_hash(char *login_password, const unsigned char *account_hash)
     do {
         get_password(login_password);
 
-        if (crypto_pwhash_str_verify ((const char *)account_hash, login_password, strlen(login_password)) != 0) {
-        fprintf(stderr, RED "ERROR: Wrong password\n" RESET);
-        max_password_tries++;
+        if (crypto_pwhash_str_verify ((const char *)hash, login_password, strlen(login_password)) != 0) 
+        {
+            fprintf(stderr, RED "ERROR: Wrong password\n" RESET);
+            max_password_tries++;
         }
 
-        if (max_password_tries > 2) {
+        if (max_password_tries > 2) 
+        {
             fprintf(stderr, RED "Max tries reached, exiting application\n" RESET);
             return 1;
         }
 
-    } while (crypto_pwhash_str_verify ((const char *)account_hash, login_password, strlen(login_password)) != 0);
+    } while (crypto_pwhash_str_verify ((const char *)hash, login_password, strlen(login_password)) != 0);
     return 0;
 }
 
 void display_main(char *username)
 {
-    drawline(30, '-');
-    printf(BLU "Hi %s, welcome to Inventory.c\n" RESET, username);
-    drawline(30, '-');
-    printf(BLU "Enter '1' to add an item\n" RESET);
-    printf(BLU "Enter '2' to remove an item\n" RESET);
-    printf(BLU "Enter '3' to modify stock\n" RESET);
-    drawline(30, '-');
+    drawline(70, '-');
+    printf(BLU "                 Hi %s, welcome to Inventory.c\n" RESET, username);
+    drawline(70, '-');
+    printf("\n");
+    printf(BLU "                     Enter '1' to add an item\n" RESET);
+    printf(BLU "                     Enter '2' to remove an item\n" RESET);
+    printf(BLU "                     Enter '3' to modify stock\n" RESET);
+    printf("\n");
 }
 
-// show current inventory select * from user_inventory
+// show inventory select * from view
+int show_inventory(sqlite3 *db, int session_id) 
+{
+    char *user_inventory = "select * from user_inventory where user_id = ?;";
 
-// check date format
+    rc = sqlite3_prepare_v2(db, user_inventory, -1, &stmt, NULL);
+    if (rc != SQLITE_OK) 
+    {
+        fprintf(stderr, RED "Failed to prepare statement: %s\n" RESET, sqlite3_errmsg(db));
+        return 1;
+    }
 
-// check quantity format
+    rc = sqlite3_bind_int(stmt, 1, session_id);
+    if (rc != SQLITE_OK) 
+    {
+        fprintf(stderr, RED "Failed to bind ID: %s\n" RESET, sqlite3_errmsg(db));
+        return 1;
+    }
 
-// 
+    int col_count = sqlite3_column_count(stmt);
+
+    drawline(70, '-');
+    printf("%-10s %-10s %-22s %-14s %-14s\n", "User ID", "Prod ID", "Name", "Quantity", "Value");
+    drawline(70, '-');
+
+    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) 
+    {
+        int user_id = sqlite3_column_int(stmt, 0);
+        int prod_id = sqlite3_column_int(stmt, 1);
+        const unsigned char *prod_name = sqlite3_column_text(stmt, 2);
+        int quantity = sqlite3_column_int(stmt, 3);
+        float value = sqlite3_column_double(stmt, 4);
+
+        printf("%-10d %-10d %-22s %-14d €%-14.2f", user_id, prod_id, prod_name, quantity, value);
+        printf("\n");
+        drawline(70, '-');
+    }
+
+    sqlite3_reset(stmt);
+    return 0;
+}
+
+
