@@ -47,3 +47,23 @@ void display_main(char *username);
 
 // show inventory select * from view
 int show_inventory(sqlite3 *db, int session_id);
+
+// Get product name
+char *get_prod_name(char *product_name); 
+
+// Get product price
+double get_price(double *price);
+
+// Get order and receive dates
+int get_dates(char *date);
+
+// Get quantity
+int get_quantity(int *quantity);
+
+// Add inventory to DB
+int add_inventory(sqlite3 *db, int session_id, char *product_name, double *price, char *date_ordered, char *date_received, int *quantity);
+
+int remove_inventory(sqlite3 *db, char *product_name);
+
+int modify_inventory(sqlite3 *db, char *product_name, double *price, int *quantity);
+
