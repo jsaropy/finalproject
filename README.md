@@ -110,11 +110,12 @@ Update details of an existing product, such as changing its name, price, or quan
 
 ## Security Measures
 This project employs several security best practices:
-• Secure Password Storage:
+- Secure Password Storage:
 User passwords are never stored in plaintext. Instead, they are securely hashed using the Argon2 algorithm through the libsodium API.
-• Protected SQL Queries:
+- Protected SQL Queries:
 All database queries use sqlite3_prepare_v2() and sqlite3_bind_text() to safely handle user inputs, reducing the risk of SQL injection.
-• Hash Verification on Login:
+- Hash Verification on Login:
 During login, entered passwords are hashed and compared against the stored hashes, ensuring that only authorized users gain access.
 
-If you got any recommendations please email me on shvanjaro@hotmail.com. I’m happy to learn from you :) (This is one of my first projects).
+> [!IMPORTANT]
+> If you got any recommendations please email me on shvanjaro@hotmail.com. I’m happy to learn from you :) (This is one of my first projects).
