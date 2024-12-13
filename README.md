@@ -12,10 +12,10 @@ By using this CLI tool, you can efficiently manage your inventory without dealin
 
 ## Dependencies
 To build and run this application, ensure that the following dependencies are installed:
-    • SQLite3: Required for local database operations.
-    • Libsodium: Provides Argon2 password hashing functionality.
-    • unistd.h: A standard POSIX header (available on Unix-like systems) for various system calls and functions.
-    • Make: Used to compile the program using the provided Makefile.
+- SQLite3: Required for local database operations.
+- Libsodium: Provides Argon2 password hashing functionality.
+- unistd.h: A standard POSIX header (available on Unix-like systems) for various system calls and functions.
+- Makefile: Used to compile the program using the provided Makefile.
 
 ## Features
     • Secure Account Management:
@@ -36,6 +36,43 @@ To build and run this application, ensure that the following dependencies are in
 
 >[!NOTE] 
 > Invalid inputs prompt the user to re-enter a valid choice, ensuring smooth navigation and user experience.
+
+## Database Design
+The database is structured to support users, their orders, and the products associated with those orders. Its schema consists of four interrelated tables: users, orders, orderproducts, and products.
+
+    - users
+        user_id (PK): A unique identifier for each user.
+        username: The user’s chosen login name.
+        hash: A securely stored hash of the user’s password.
+
+> [!NOTE]
+> Each user can have multiple orders associated with their account, establishing a one-to-many relationship between users and orders.
+
+    - orders
+        order_id (PK): A unique identifier for each order.
+        user_id (FK): References the user_id in the users table, linking each order to a specific user.
+        date_ordered: The date and time the order was created.
+        date_received: The date and time the order was completed or received.
+
+> [!NOTE]
+> Each order is placed by a single user, and an order can contain multiple products through the orderproducts table.
+
+    - orderproducts
+        order_id (FK): References the order_id in the orders table, associating each set of products with a particular order.
+        prod_id (FK): References the prod_id in the products table, identifying which product is included in the order.
+        quantity: The number of units of the given product included in the order.
+
+> [!NOTE]
+> This table acts as a junction between orders and products, enabling a many-to-many relationship. An order can have multiple products, and a product can appear in multiple orders.
+
+    - products
+        prod_id (PK): A unique identifier for each product.
+        prod_name: The name of the product.
+        prod_price: The unit price of the product.
+
+> [!NOTE]
+> The products table stores the catalog of items that users can add to their orders. It connects to orderproducts so that the same product can be linked to many different orders.
+
 ## User Flow & Features in Detail
 ### Registration
 1. Create a New Account:
