@@ -8,10 +8,10 @@ By using this CLI tool, you can efficiently manage your inventory without dealin
 
 ## Dependencies
 To build and run this application, ensure that the following dependencies are installed:
-- SQLite3: Required for local database operations.
-- Libsodium: Provides Argon2 password hashing functionality.
-- unistd.h: A standard POSIX header (available on Unix-like systems) for various system calls and functions.
-- Makefile: Used to compile the program using the provided Makefile.
+- **SQLite3**: Required for local database operations.
+- **Libsodium**: Provides Argon2 password hashing functionality.
+- **unistd.h**: A standard POSIX header (available on Unix-like systems) for various system calls and functions.
+- **Makefile**: Used to compile the program using the provided Makefile.
 
 ## Features
 • Secure Account Management:
