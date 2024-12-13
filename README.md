@@ -1,103 +1,83 @@
-# CLI INVENTORY MANAGEMENT
-#### Video Demo: <URL HERE>
-#### Description: 
-Final Project CS50x ~ Shvan Jaro
-Hi this is my final project for CS50x: Introduction to Computer Science.
-My final project is an cli program, that entails an inventory management system to easily track the inventory of businesses. 
-The cli program allows the user to add/remove/modify and track the inventory of their business.
+# Inventory Management
 
-TODO:
-## ✅ 1. Make the display for the starting page of the CLI program 
+## CS50x Final Project by Shvan Jaro
 
-## ✅ 2. Complete get user input number
-- Don't use cs50.h
-- Create get input yourself 
+Welcome to my final project for CS50x: Introduction to Computer Science. This command-line interface (CLI) application functions as an inventory management system, written in C. It enables you to add, remove, and modify items, ensuring you can easily maintain and track stock levels.
 
-
-## 3. Create DB
-✅ - Create DB with sqlite3
-✅- Link db into C program
-✅- READ SQLite C api docs
+All application data is stored in inventory.db, an SQLite database that includes the following tables:
 
 ![Database](assets/DB-finalproject.png)
 
-# 4. Redirect user to pages
-## Redirect user to register page (If user types 1 display the following things):
-    - First clear terminal screen ✅
-    - display_register next ✅
-    - Username (Must be unique, so check DB): ✅
-        - For username, malloc a place in memory for the maximum length of the string -> username ✅
-        - ⛔ ERROR: username accepts whitespace 
-        - Check if username exists in DB ✅
-        - If exist, output error ✅
-    - Password  ✅
-    - ⛔ ERROR: password accepts whitespace
-    - No terminal output ✅
-    - Password (Repeat) ✅
-    - Store username in database ✅
-    - Hash password, and store in database (function hash) ✅
+By using this CLI tool, you can efficiently manage your inventory without dealing with complicated graphical interfaces. The underlying database structure ensures that your data remains organized, consistent, and easily accessible.
+
+## Dependencies
+To build and run this application, ensure that the following dependencies are installed:
+    • SQLite3: Required for local database operations.
+    • Libsodium: Provides Argon2 password hashing functionality.
+    • unistd.h: A standard POSIX header (available on Unix-like systems) for various system calls and functions.
+    • Make: Used to compile the program using the provided Makefile.
+
+## Features
+    • Secure Account Management:
+        ◦ Users can register for accounts.
+        ◦ Passwords are hashed using the Argon2 algorithm via the libsodium API, ensuring secure password storage.
+
+    • Comprehensive Inventory Operations:
+        ◦ Perform basic CRUD (Create, Read, Update, Delete) operations on a local database (using `sqlite3`).
+        ◦ View inventory details, including product ID, name, price, quantity, and total value.
+
+    • User-Friendly Interaction:
+        ◦ Upon login, the user's entire inventory is displayed.
+        ◦ Clear menu options guide the user:
+            ▪ 0: Exit the application
+            ▪ 1: Register a new account
+            ▪ 2: Log in to an existing account
+            ▪ 3: View application description.
+
+>[!NOTE] 
+> Invalid inputs prompt the user to re-enter a valid choice, ensuring smooth navigation and user experience.
+## User Flow & Features in Detail
+### Registration
+1. Create a New Account:
+The user chooses Register to create a new account by providing a unique username and a password.
+2. Username Constraints:
+The username must not already exist in the database, and it must be between 5-50 characters.
+3. Password Entry:
+The user enters a password (also 5-50 characters) and is then prompted to re-enter it for confirmation.
+4. Password Security:
+The password is hashed using the Argon2 algorithm (via the libsodium API) and stored securely in the database.
+5. Completion:
+After successful registration, the application terminates and needs to be started again for further use.
+
+### Login
+1. Account Verification:
+The user selects Log In and is prompted for their username and password.
+2. Database Lookup:
+The username is checked against the database; if found, the password is hashed and verified against the stored hash using libsodium.
+3. Access Granted:
+On successful login, the main application screen is displayed, allowing further actions.
+
+### Main Menu (After Login)
+Once logged in, the user sees four main choices:
+0. Exit the Program:
+Close the application immediately.
+1. Add Inventory:
+Add a new product to the inventory by specifying product details (e.g., name, price, quantity). After successful addition, the updated inventory table is displayed.
+2. Remove Inventory:
+Remove an existing product from the database. The user is prompted for a product identifier, and upon confirmation, the product is deleted.
+3. Modify Inventory:
+Update details of an existing product, such as changing its name, price, or quantity.
 
 > [!NOTE]
- > I need to provide a way to exit at any time during the program, because the user can get stuck.
- > Additionally fix errors?
+> Invalid inputs at any point will result in a prompt to re-enter a valid option, ensuring a smooth and user-friendly experience throughout.
 
-## Redirect user to login page (If user types 2 display the following things):
-    - First clear terminal screen ✅
-    - Username: (get_username) ✅
-        - Compare if username exists in DB ✅
-        - If not print error (while loop) ✅
-    - Password (*) (get_password) ✅
-        - Compare password with password hashes (while loop) ✅
-        - libsodium has a way to compare the password hashes. ✅
+## Security Measures
+This project employs several security best practices:
+• Secure Password Storage:
+User passwords are never stored in plaintext. Instead, they are securely hashed using the Argon2 algorithm through the libsodium API.
+• Protected SQL Queries:
+All database queries use sqlite3_prepare_v2() and sqlite3_bind_text() to safely handle user inputs, reducing the risk of SQL injection.
+• Hash Verification on Login:
+During login, entered passwords are hashed and compared against the stored hashes, ensuring that only authorized users gain access.
 
-     - Show the user the description (If user types 3 display the following things): ✅
-        - display_description ✅
-        - display menu ✅
-        - Only add the description at the top of the menu, and refresh the page. ✅
-
-    - When log in successful, display the main screen
-        - assign the struct user the logged in username ✅
-        - assign the struct user the user_id which becomes the session ID ✅
-        - Add mock product into database (all tables) ✅
-        - Convert sql querys to functions -> just get hash left ✅
-        - Error at checking register & login username, the error messages get skipped ✅
-        - Create view in database so that you do not use a gigantic query ✅
-        - Show current products based on session ID ✅
-        - The goal is to show/add/modify products based on this session ID 
-        - Showing current inventory is the standard display of main menu 
-        - ⛔ Extend user input choice to 4 choices, >a choice to exit the program<
-
-        - Allow to add inventory items
-            - Product name
-            - Product price
-            - place user_id in orders
-            - Field with date ordered
-            - Date received
-            - Quantity
-            - place order_id in orderproducts
-            - place prod_id in order products
-            - place prod_id in product supplier
-            - place supplier_id in product supplier
-
-                SQL querys to insert
-                sqlite> INSERT INTO orders (user_id, date_ordered, date_received) VALUES (1, '11-11-2024', '12-11-2024');
-                sqlite> INSERT INTO products (prod_name, prod_price) VALUES ('BIC Pens', 20.00);
-                sqlite> INSERT INTO orderproducts (order_id, prod_id, quantity) VALUES (1, 1, 3);
-
-        - Modify products
-            - Allow user to modify the products in the database (e.g., quantity etc)
-
-
-
-# 5. Complete inventory UI
-- User has the option to add inventory
-- Put this item in DB
-- Show DB items in home 
-- Remove Inventory
-- Remove from DB
-- Remove from UI
-  
-# Dependencies (Add tutorials for installing these before using project)
-- SQLite3
-- Libsodium
-- Unistd.h -> for Windows
+If you got any recommendations please email me on shvanjaro@hotmail.com. I’m happy to learn from you :) (This is one of my first projects).
