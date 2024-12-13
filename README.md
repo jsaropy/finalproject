@@ -79,27 +79,27 @@ The database is structured to support users, their orders, and the products asso
 > [!NOTE]
 > Each user can have multiple orders associated with their account, establishing a one-to-many relationship between users and orders.
 
-    - orders
-        - order_id (PK): A unique identifier for each order.
-        - user_id (FK): References the user_id in the users table, linking each order to a specific user.
-        - date_ordered: The date and time the order was created.
-        - date_received: The date and time the order was completed or received.
+- orders
+    - order_id (PK): A unique identifier for each order.
+    - user_id (FK): References the user_id in the users table, linking each order to a specific user.
+    - date_ordered: The date and time the order was created.
+    - date_received: The date and time the order was completed or received.
 
 > [!NOTE]
 > Each order is placed by a single user, and an order can contain multiple products through the orderproducts table.
 
-    - orderproducts
-        - order_id (FK): References the order_id in the orders table, associating each set of products with a particular order.
-        - prod_id (FK): References the prod_id in the products table, identifying which product is included in the order.
-        - quantity: The number of units of the given product included in the order.
+- orderproducts
+    - order_id (FK): References the order_id in the orders table, associating each set of products with a particular order.
+    - prod_id (FK): References the prod_id in the products table, identifying which product is included in the order.
+    - quantity: The number of units of the given product included in the order.
 
 > [!NOTE]
 > This table acts as a junction between orders and products, enabling a many-to-many relationship. An order can have multiple products, and a product can appear in multiple orders.
 
-    - products
-        - prod_id (PK): A unique identifier for each product.
-        - prod_name: The name of the product.
-        - prod_price: The unit price of the product.
+- products
+    - prod_id (PK): A unique identifier for each product.
+    - prod_name: The name of the product.
+    - prod_price: The unit price of the product.
 
 > [!NOTE]
 > The products table stores the catalog of items that users can add to their orders. It connects to orderproducts so that the same product can be linked to many different orders.
@@ -107,34 +107,34 @@ The database is structured to support users, their orders, and the products asso
 ## User Flow & Features in Detail
 ### Registration
 1. Create a New Account:
-- The user chooses Register to create a new account by providing a unique username and a password.
+    - The user chooses Register to create a new account by providing a unique username and a password.
 2. Username Constraints:
-- The username must not already exist in the database, and it must be between 5-50 characters.
+    - The username must not already exist in the database, and it must be between 5-50 characters.
 3. Password Entry:
-- The user enters a password (also 5-50 characters) and is then prompted to re-enter it for confirmation.
+    - The user enters a password (also 5-50 characters) and is then prompted to re-enter it for confirmation.
 4. Password Security:
-- The password is hashed using the Argon2 algorithm (via the libsodium API) and stored securely in the database.
+    - The password is hashed using the Argon2 algorithm (via the libsodium API) and stored securely in the database.
 5. Completion:
-- After successful registration, the application terminates and needs to be started again for further use.
+    - After successful registration, the application terminates and needs to be started again for further use.
 
 ### Login
 1. Account Verification:
-- The user selects Log In and is prompted for their username and password.
+    - The user selects Log In and is prompted for their username and password.
 2. Database Lookup:
-- The username is checked against the database; if found, the password is hashed and verified against the stored hash using libsodium.
+    - The username is checked against the database; if found, the password is hashed and verified against the stored hash using libsodium.
 3. Access Granted:
-- On successful login, the main application screen is displayed, allowing further actions.
+    - On successful login, the main application screen is displayed, allowing further actions.
 
 ### Main Menu (After Login)
 Once logged in, the user sees four main choices:
 0. Exit the Program:
-- Close the application immediately.
+    - Close the application immediately.
 1. Add Inventory:
-- Add a new product to the inventory by specifying product details (e.g., name, price, quantity). After successful addition, the updated inventory table is displayed.
+    - Add a new product to the inventory by specifying product details (e.g., name, price, quantity). After successful addition, the updated inventory table is displayed.
 2. Remove Inventory:
-- Remove an existing product from the database. The user is prompted for a product identifier, and upon confirmation, the product is deleted.
+    - Remove an existing product from the database. The user is prompted for a product identifier, and upon confirmation, the product is deleted.
 3. Modify Inventory:
-- Update details of an existing product, such as changing its name, price, or quantity.
+    - Update details of an existing product, such as changing its name, price, or quantity.
 
 > [!NOTE]
 > Invalid inputs at any point will result in a prompt to re-enter a valid option, ensuring a smooth and user-friendly experience throughout.
