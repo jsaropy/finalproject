@@ -14,21 +14,21 @@ To build and run this application, ensure that the following dependencies are in
 - **Makefile**: Used to compile the program using the provided Makefile.
 
 ## Features
-• Secure Account Management:
-    ◦ Users can register for accounts.
-    ◦ Passwords are hashed using the Argon2 algorithm via the libsodium API, ensuring secure password storage.
+- Secure Account Management:
+    - Users can register for accounts.
+    - Passwords are hashed using the Argon2 algorithm via the libsodium API, ensuring secure password storage.
 
-• Comprehensive Inventory Operations:
-    ◦ Perform basic CRUD (Create, Read, Update, Delete) operations on a local database (using `sqlite3`).
-    ◦ View inventory details, including product ID, name, price, quantity, and total value.
+- Comprehensive Inventory Operations:
+    - Perform basic CRUD (Create, Read, Update, Delete) operations on a local database (using `sqlite3`).
+    - View inventory details, including product ID, name, price, quantity, and total value.
 
-• User-Friendly Interaction:
-    ◦ Upon login, the user's entire inventory is displayed.
-    ◦ Clear menu options guide the user:
-        ▪ 0: Exit the application
-        ▪ 1: Register a new account
-        ▪ 2: Log in to an existing account
-        ▪ 3: View application description.
+- User-Friendly Interaction:
+    - Upon login, the user's entire inventory is displayed.
+    - Clear menu options guide the user:
+        - 0: Exit the application
+        - 1: Register a new account
+        - 2: Log in to an existing account
+        - 3: View application description.
 
 >[!NOTE] 
 > Invalid inputs prompt the user to re-enter a valid choice, ensuring smooth navigation and user experience.
