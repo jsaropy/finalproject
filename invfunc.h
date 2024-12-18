@@ -63,7 +63,8 @@ int get_quantity(int *quantity);
 // Add inventory to DB
 int add_inventory(sqlite3 *db, int session_id, char *product_name, double *price, char *date_ordered, char *date_received, int *quantity);
 
-int remove_inventory(sqlite3 *db, char *product_name);
+int remove_inventory(sqlite3 *db, int session_id, char *product_name);
 
-int modify_inventory(sqlite3 *db, char *product_name, double *price, int *quantity);
+int modify_inventory(sqlite3 *db, int session_id, char *product_name, double *price, int *quantity);
+
 

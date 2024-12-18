@@ -263,7 +263,7 @@ void display_main(char *username)
 // show inventory select * from view
 int show_inventory(sqlite3 *db, int session_id) 
 {
-    char *user_inventory = "select * from user_inventory where user_id = ?;";
+    char *user_inventory = "select prod_id, prod_name, prod_price, total_quantity, total_value from user_inventory where user_id = ?;";
 
     rc = sqlite3_prepare_v2(db, user_inventory, -1, &stmt, NULL);
     if (rc != SQLITE_OK) 
@@ -285,11 +285,11 @@ int show_inventory(sqlite3 *db, int session_id)
 
     while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) 
     {
-        int prod_id = sqlite3_column_int(stmt, 1);
-        const unsigned char *prod_name = sqlite3_column_text(stmt, 2);
-        double prod_price = sqlite3_column_double(stmt, 3);
-        int quantity = sqlite3_column_int(stmt, 4);
-        float value = sqlite3_column_double(stmt, 5);
+        int prod_id = sqlite3_column_int(stmt, 0);
+        const unsigned char *prod_name = sqlite3_column_text(stmt, 1);
+        double prod_price = sqlite3_column_double(stmt, 2);
+        int quantity = sqlite3_column_int(stmt, 3);
+        float value = sqlite3_column_double(stmt, 4);
 
         printf("%-10d %-20s €%-14.2f %-14d €%-14.2f", prod_id, prod_name, prod_price, quantity, value);
         printf("\n");
@@ -428,10 +428,10 @@ int get_quantity(int *quantity)
         }
     } while (*quantity <= 0 || result != 1);
 
+    while (getchar() != '\n');
     return 0;
 }
 
-//TODO
 int add_inventory(sqlite3 *db, int session_id, char *product_name, double *price, char *date_ordered, char *date_received, int *quantity)
 {
     char *orders_query = "INSERT INTO orders (user_id, date_ordered, date_received) VALUES (?, ?, ?);";
@@ -472,12 +472,11 @@ int add_inventory(sqlite3 *db, int session_id, char *product_name, double *price
         return 1;
     }
 
-    //because 
-    int prod_id = sqlite3_last_insert_rowid(db);
+    int order_id = sqlite3_last_insert_rowid(db);
 
     sqlite3_reset(stmt);
 
-    char *products_query = "INSERT INTO products (prod_name, prod_price) VALUES (?, ?);";
+    char *products_query = "INSERT INTO products (prod_name, user_id, prod_price) VALUES (?, ?, ?);";
     
     // Prepare SQL insert into products table, this needs to be repeated due to different tables and different values
     rc = sqlite3_prepare_v2(db, products_query, -1, &stmt, NULL);
@@ -493,8 +492,15 @@ int add_inventory(sqlite3 *db, int session_id, char *product_name, double *price
         fprintf(stderr, RED "Failed to bind product name: %s\n" RESET, sqlite3_errmsg(db));
         return 1;
     }
+
+    rc = sqlite3_bind_int(stmt, 2, session_id);
+    if (rc != SQLITE_OK) 
+    {
+        fprintf(stderr, RED "ERROR: Failed to bind user_id: %s\n" RESET, sqlite3_errmsg(db));
+        return 1;
+    }
     
-    rc = sqlite3_bind_double(stmt, 2, *price);
+    rc = sqlite3_bind_double(stmt, 3, *price);
     if (rc != SQLITE_OK) 
     {
         fprintf(stderr, RED "Failed to bind product price: %s\n" RESET, sqlite3_errmsg(db));
@@ -508,11 +514,11 @@ int add_inventory(sqlite3 *db, int session_id, char *product_name, double *price
         return 1;
     }
 
-    int order_id = sqlite3_last_insert_rowid(db);
+    int prod_id = sqlite3_last_insert_rowid(db);
 
     sqlite3_reset(stmt);
 
-    char *op_query = "INSERT INTO orderproducts (order_id, prod_id, quantity) VALUES (?, ?, ?);";
+    char *op_query = "INSERT INTO orderproducts (order_id, prod_id, user_id, quantity) VALUES (?, ?, ?, ?);";
     
     rc = sqlite3_prepare_v2(db, op_query, -1, &stmt, NULL);
     if (rc != SQLITE_OK) 
@@ -535,7 +541,14 @@ int add_inventory(sqlite3 *db, int session_id, char *product_name, double *price
         return 1;
     }
 
-    rc = sqlite3_bind_int(stmt, 3, *quantity);
+    rc = sqlite3_bind_int(stmt, 3, session_id);
+    if (rc != SQLITE_OK) 
+    {
+        fprintf(stderr, RED "ERROR: Failed to bind user_id: %s\n" RESET, sqlite3_errmsg(db));
+        return 1;
+    }
+    
+    rc = sqlite3_bind_int(stmt, 4, *quantity);
     if (rc != SQLITE_OK) 
     {
         fprintf(stderr, RED "ERROR: Failed to bind qunatity: %s\n" RESET, sqlite3_errmsg(db));
@@ -553,9 +566,9 @@ int add_inventory(sqlite3 *db, int session_id, char *product_name, double *price
     return 0; 
 }
  
-int remove_inventory(sqlite3 *db, char *product_name)
+int remove_inventory(sqlite3 *db, int session_id, char *product_name)
 {
-    char *prod_id_query = "SELECT prod_id FROM products WHERE prod_name = ?;";
+    char *prod_id_query = "SELECT prod_id FROM products WHERE prod_name = ? AND user_id = ?;";
     
     rc = sqlite3_prepare_v2(db, prod_id_query, -1, &stmt, NULL);
     if (rc != SQLITE_OK) 
@@ -568,6 +581,13 @@ int remove_inventory(sqlite3 *db, char *product_name)
     if (rc != SQLITE_OK) 
     {
         fprintf(stderr, RED "ERROR: Failed to bind product name: %s\n" RESET, sqlite3_errmsg(db));
+        return 1;
+    }
+
+    rc = sqlite3_bind_int(stmt, 2, session_id);
+    if (rc != SQLITE_OK) 
+    {
+        fprintf(stderr, RED "ERROR: Failed to bind user_id: %s\n" RESET, sqlite3_errmsg(db));
         return 1;
     }
 
@@ -586,7 +606,7 @@ int remove_inventory(sqlite3 *db, char *product_name)
 
     sqlite3_reset(stmt);
 
-    char *delete_product = "DELETE FROM products WHERE prod_name = ?;";
+    char *delete_product = "DELETE FROM products WHERE prod_name = ? AND user_id = ?;";
 
     rc = sqlite3_prepare_v2(db, delete_product, -1, &stmt, NULL);
     if (rc != SQLITE_OK) 
@@ -602,6 +622,13 @@ int remove_inventory(sqlite3 *db, char *product_name)
         return 1;
     }
 
+    rc = sqlite3_bind_int(stmt, 2, session_id);
+    if (rc != SQLITE_OK) 
+    {
+        fprintf(stderr, RED "ERROR: Failed to bind user_id: %s\n" RESET, sqlite3_errmsg(db));
+        return 1;
+    }
+
     rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE) 
     {
@@ -611,7 +638,7 @@ int remove_inventory(sqlite3 *db, char *product_name)
 
     sqlite3_reset(stmt);
 
-    char *delete_orderproducts = "DELETE FROM orderproducts WHERE prod_id = ?;";
+    char *delete_orderproducts = "DELETE FROM orderproducts WHERE prod_id = ? AND user_id = ?;";
 
     rc = sqlite3_prepare_v2(db, delete_orderproducts, -1, &stmt, NULL);
     if (rc != SQLITE_OK) 
@@ -627,6 +654,14 @@ int remove_inventory(sqlite3 *db, char *product_name)
         return 1;
     }
 
+    rc = sqlite3_bind_int(stmt, 2, session_id);
+    if (rc != SQLITE_OK) 
+    {
+        fprintf(stderr, RED "ERROR: Failed to bind user_id: %s\n" RESET, sqlite3_errmsg(db));
+        return 1;
+    }
+
+
     rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE) 
     {
@@ -638,13 +673,13 @@ int remove_inventory(sqlite3 *db, char *product_name)
     return 0;
 }
 
-int modify_inventory(sqlite3 *db, char *product_name, double *price, int *quantity)
+int modify_inventory(sqlite3 *db, int session_id, char *product_name, double *price, int *quantity)
 {
     int prod_id;
     printf("Please enter the Prod ID of the item to modify: ");
     scanf("%i", &prod_id);
 
-    char *select_prodid = "SELECT prod_name, prod_price FROM products WHERE prod_id = ?;";
+    char *select_prodid = "SELECT prod_name, prod_price FROM products WHERE prod_id = ? and user_id = ?;";
 
     rc = sqlite3_prepare_v2(db, select_prodid, -1, &stmt, NULL);
     if (rc != SQLITE_OK) 
@@ -659,6 +694,14 @@ int modify_inventory(sqlite3 *db, char *product_name, double *price, int *quanti
         fprintf(stderr, RED "ERROR: Failed to bind product id: %s\n" RESET, sqlite3_errmsg(db));
         return 1;
     }
+
+    rc = sqlite3_bind_int(stmt, 2, session_id);
+    if (rc != SQLITE_OK) 
+    {
+        fprintf(stderr, RED "ERROR: Failed to bind user_id: %s\n" RESET, sqlite3_errmsg(db));
+        return 1;
+    }
+
 
     if (sqlite3_step(stmt) == SQLITE_ROW) 
     {
@@ -677,7 +720,7 @@ int modify_inventory(sqlite3 *db, char *product_name, double *price, int *quanti
                 printf("New ");
                 get_prod_name(product_name);
 
-                char *modify_name = "UPDATE products SET prod_name = ? WHERE prod_id = ?;";
+                char *modify_name = "UPDATE products SET prod_name = ? WHERE prod_id = ? AND user_id = ?;";
 
                 rc = sqlite3_prepare_v2(db, modify_name, -1, &stmt, NULL);
                 if (rc != SQLITE_OK) 
@@ -697,6 +740,14 @@ int modify_inventory(sqlite3 *db, char *product_name, double *price, int *quanti
                     fprintf(stderr, RED "ERROR: Failed to bind product id: %s\n" RESET, sqlite3_errmsg(db));
                     return 1;
                 }   
+
+                rc = sqlite3_bind_int(stmt, 3, session_id);
+                if (rc != SQLITE_OK) 
+                {
+                    fprintf(stderr, RED "ERROR: Failed to bind user_id: %s\n" RESET, sqlite3_errmsg(db));
+                    return 1;
+                }
+
                 rc = sqlite3_step(stmt);
                 if (rc != SQLITE_DONE) 
                 {
@@ -711,7 +762,7 @@ int modify_inventory(sqlite3 *db, char *product_name, double *price, int *quanti
                 printf("New ");
                 get_price(price);
 
-                char *modify_price = "UPDATE products SET prod_price = ? WHERE prod_id = ?;";
+                char *modify_price = "UPDATE products SET prod_price = ? WHERE prod_id = ? AND user_id = ?;";
 
                 rc = sqlite3_prepare_v2(db, modify_price, -1, &stmt, NULL);
                 if (rc != SQLITE_OK) 
@@ -734,6 +785,13 @@ int modify_inventory(sqlite3 *db, char *product_name, double *price, int *quanti
                     return 1;
                 }
 
+                rc = sqlite3_bind_int(stmt, 3, session_id);
+                if (rc != SQLITE_OK) 
+                {
+                    fprintf(stderr, RED "ERROR: Failed to bind user_id: %s\n" RESET, sqlite3_errmsg(db));
+                    return 1;
+                }
+
                 rc = sqlite3_step(stmt);
                 if (rc != SQLITE_DONE) 
                 {
@@ -745,16 +803,19 @@ int modify_inventory(sqlite3 *db, char *product_name, double *price, int *quanti
                 return 0;
             }
             else if (strcasecmp(user_choice, options_arr[2]) == 0)
-            {
-               char *modify_quant = "UPDATE orderproducts SET quantity = ? WHERE prod_id = ?;";
-
+            { 
+                printf("New ");
+                get_quantity(quantity); 
+                
+                char *modify_quant = "UPDATE orderproducts SET quantity = ? WHERE prod_id = ? AND user_id = ?;";
+ 
                 rc = sqlite3_prepare_v2(db, modify_quant, -1, &stmt, NULL);
                 if (rc != SQLITE_OK) 
                 {
-                   fprintf(stderr, RED "ERROR: Failed to prepare statement: %s\n" RESET, sqlite3_errmsg(db));
-                   return 1;
+                    fprintf(stderr, RED "ERROR: Failed to prepare statement: %s\n" RESET, sqlite3_errmsg(db));
+                    return 1;
                 }
-
+ 
                 rc = sqlite3_bind_int(stmt, 1, *quantity);
                 if (rc != SQLITE_OK) 
                 {
@@ -769,6 +830,13 @@ int modify_inventory(sqlite3 *db, char *product_name, double *price, int *quanti
                     return 1;
                 }
 
+                rc = sqlite3_bind_int(stmt, 3, session_id);
+                if (rc != SQLITE_OK) 
+                {
+                    fprintf(stderr, RED "ERROR: Failed to bind user_id: %s\n" RESET, sqlite3_errmsg(db));
+                    return 1;
+                }
+
                 rc = sqlite3_step(stmt);
                 if (rc != SQLITE_DONE) 
                 {
@@ -778,12 +846,12 @@ int modify_inventory(sqlite3 *db, char *product_name, double *price, int *quanti
                 
                 sqlite3_reset(stmt);
                 return 0;
-            }
+            } 
             else
-            {
+            { 
                 fprintf(stderr, RED"ERROR: Column not found\n"RESET);
                 return 1;
-            }
+            } 
         }
     } 
     else 

@@ -240,7 +240,6 @@ int main(void)
                 case 1: 
                     printf(BLU"Add inventory\n"RESET);
                     // Get product name to add
-                    printf("Product Name: ");
                     get_prod_name(prod_name);
 
                     // Get product price to add
@@ -267,30 +266,31 @@ int main(void)
                     }
                     
                     clearscr();
+                    break;
                 case 2:
                     printf(BLU"Remove inventory\n"RESET);
-                    printf("Please enter the item to remove: ");
                     get_prod_name(prod_name);
 
-                    if (remove_inventory(db, prod_name) != 0)
-                    {
-                        return 1;
-                    };
-
-                    clearscr();
-                case 3:
-                    printf(BLU"Modify inventory\n"RESET);
-
-                    if (modify_inventory(db, prod_name, prod_price, quantity) != 0)
+                    if (remove_inventory(db,activeuser.session_id, prod_name) != 0)
                     {
                         return 1;
                     }
 
                     clearscr();
+                    break;
+                case 3:
+                    printf(BLU"Modify inventory\n"RESET);
+
+                    if (modify_inventory(db, activeuser.session_id, prod_name, prod_price, quantity) != 0)
+                    {
+                        return 1;
+                    }
+
+                    clearscr();
+                    break;
             }       
         } while (loggedin_input != 0);
 
-        
         free(login_username);
         free(prod_name);
         free(prod_price);
@@ -299,6 +299,5 @@ int main(void)
         free(quantity);
         rc = sqlite3_close(db);
         sqlite3_finalize(stmt);
-
     }
 }
