@@ -44,7 +44,7 @@ sudo apt-get install build-essential make sqlite3 libsqlite3-dev libsodium-dev
 
 1. Clone the repository
 ```
-sudo apt-get install build-essential make sqlite3 libsqlite3-dev libsodium-dev
+git clone https://github.com/jsaropy/finalproject.git
 ```
 
 2. Navigate to the Project Directory:
