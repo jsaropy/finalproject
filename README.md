@@ -1,6 +1,6 @@
 # Inventory Management
 
-Video Demo: 
+Video Demo: https://youtu.be/RJN56rgvfG8
 
 Welcome to my final project for CS50x: Introduction to Computer Science. This command-line interface (CLI) application functions as an inventory management system, written in C. It enables you to add, remove, and modify items, ensuring you can easily maintain and track stock levels.
 
